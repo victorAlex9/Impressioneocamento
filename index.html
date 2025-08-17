@@ -1,284 +1,486 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Orçamento Rápido</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Estilo para inputs number não mostrarem as setas */
-        input[type='number']::-webkit-inner-spin-button,
-        input[type='number']::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type='number'] {
-            -moz-appearance: textfield;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerador de Orçamento</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    /* Ocultar detalhes internos ao imprimir/gerar PDF */
+    @media print {
+      #internal-section { display: none !important; }
+      /* opcional: ocultar botões na impressão */
+      #actions-bar { display: none !important; }
+    }
+    /* remover setas dos inputs number */
+    input[type='number']::-webkit-inner-spin-button,
+    input[type='number']::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type='number'] { -moz-appearance: textfield; }
+  </style>
 </head>
 <body class="bg-gray-50">
+  <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
+    <header id="header" class="text-center mb-8">
+      <h1 class="text-3xl sm:text-4xl font-bold text-gray-800">Gerador de Orçamento</h1>
+      <p class="text-gray-500 mt-2">Crie orçamentos de forma rápida e eficiente.</p>
+    </header>
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
-
-        <header class="text-center mb-8">
-            <!-- 
-            ====================================================================
-            NOTA: LOGO DA EMPRESA
-            Substitua a tag <h1> abaixo pelo seu logo. 
-            Recomendado: PNG ou SVG com fundo transparente.
-            Exemplo: <img src="./caminho/para/seu-logo.png" alt="Logo da Empresa" class="h-12 mx-auto">
-            ====================================================================
-            -->
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800"><img src="./01-logo impressioneweb png.png" alt="Logo da Empresa" class="h-20 mx-auto"></h1>
-            <p class="text-gray-500 mt-2">Crie orçamentos de forma rápida e eficiente.</p>
-        </header>
-
-        <main class="grid grid-cols-1 md:grid-cols-5 gap-8">
-
-            <!-- Coluna de Adição e Cálculos -->
-            <div class="md:col-span-2 flex flex-col gap-6">
-                <!-- Card para Adicionar Produto -->
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold text-gray-700 mb-4">Adicionar Item</h2>
-                    <form id="add-item-form" class="space-y-4">
-                        <div>
-                            <label for="item-name" class="block text-sm font-medium text-gray-600">Produto/Serviço</label>
-                            <input type="text" id="item-name" placeholder="Ex: Criação de Arte" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="item-cost" class="block text-sm font-medium text-gray-600">Custo (R$)</label>
-                                <input type="number" id="item-cost" placeholder="15.50" step="0.01" min="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                            </div>
-                            <div>
-                                <label for="item-quantity" class="block text-sm font-medium text-gray-600">Quantidade</label>
-                                <input type="number" id="item-quantity" value="1" min="1" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">
-                            Adicionar ao Orçamento
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Card de Configuração Final -->
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <h2 class="text-xl font-bold text-gray-700 mb-4">Configurações</h2>
-                    <div class="space-y-4">
-                        <!-- Opção de Embalagem -->
-                        <div class="flex items-start space-x-3">
-                            <input type="checkbox" id="packaging-toggle" class="h-5 w-5 mt-0.5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
-                            <div class="flex-1">
-                                <label for="packaging-toggle" class="font-medium text-gray-700">Incluir embalagem?</label>
-                                <div id="packaging-input-container" class="mt-2 hidden">
-                                    <label for="packaging-cost" class="block text-sm font-medium text-gray-600">Custo por embalagem (R$)</label>
-                                    <input type="number" id="packaging-cost" placeholder="2.00" step="0.01" min="0" value="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Porcentagem de Lucro -->
-                        <div>
-                            <label for="profit-margin" class="block text-sm font-medium text-gray-700">Margem de Lucro (%)</label>
-                            <input type="number" id="profit-margin" value="30" min="0" placeholder="30" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        </div>
-                    </div>
-                </div>
+    <main class="grid grid-cols-1 md:grid-cols-5 gap-8">
+      <!-- Coluna de Adição e Configurações -->
+      <div class="md:col-span-6 flex flex-col gap-6">
+        <!-- Card: Adicionar Item -->
+        <div class="bg-white p-6 rounded-2xl shadow-md" id="add-item-section">
+          <h2 class="text-xl font-bold text-gray-700 mb-4">Adicionar Item</h2>
+          <form id="add-item-form" class="space-y-4">
+            <div>
+              <label for="item-name" class="block text-sm font-medium text-gray-600">Produto/Serviço</label>
+              <input type="text" id="item-name" placeholder="Ex: Criação de Arte" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
             </div>
-
-            <!-- Coluna do Orçamento -->
-            <div class="md:col-span-3">
-                <div class="bg-white p-6 rounded-2xl shadow-md min-h-full flex flex-col">
-                    <!-- Seção para o Cliente -->
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold text-gray-700">Orçamento para Cliente</h2>
-                            <button id="clear-budget" class="text-sm text-red-500 hover:text-red-700 font-semibold">Limpar Tudo</button>
-                        </div>
-                        
-                        <div id="budget-list" class="space-y-3 mb-6">
-                            <p id="empty-message" class="text-center text-gray-500 py-8">Nenhum item adicionado ainda.</p>
-                            <!-- Itens do orçamento serão inseridos aqui -->
-                        </div>
-                    </div>
-
-                    <!-- Total Final para o Cliente -->
-                    <div class="bg-indigo-50 p-4 rounded-lg mt-auto">
-                        <div class="flex justify-between items-center text-xl">
-                            <span class="font-bold text-indigo-900">VALOR FINAL P/ CLIENTE</span>
-                            <span id="grand-total" class="font-extrabold text-indigo-900">R$ 0,00</span>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Detalhes Internos -->
-                    <div class="mt-6 pt-4 border-t border-gray-200">
-                        <h3 class="text-lg font-bold text-gray-600 mb-3 text-center">Detalhes do Custo (Uso Interno)</h3>
-                        <div class="space-y-3 text-gray-600">
-                            <div class="flex justify-between items-center">
-                                <span>Subtotal dos Itens</span>
-                                <span id="subtotal" class="font-semibold text-gray-800">R$ 0,00</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Custo Embalagem</span>
-                                <span id="packaging-total" class="font-semibold text-gray-800">R$ 0,00</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span>Lucro (<span id="profit-percentage">30</span>%)</span>
-                                <span id="profit-amount" class="font-semibold text-green-600">R$ 0,00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="item-cost" class="block text-sm font-medium text-gray-600">Custo (R$)</label>
+                <input type="number" id="item-cost" placeholder="15.50" step="0.01" min="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+              </div>
+              <div>
+                <label for="item-quantity" class="block text-sm font-medium text-gray-600">Quantidade</label>
+                <input type="number" id="item-quantity" value="1" min="1" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+              </div>
             </div>
-        </main>
+            <button type="submit" class="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-transform transform hover:scale-105">Adicionar ao Orçamento</button>
+          </form>
+        </div>
+
+        <!-- Card: Configurações -->
+        <div class="bg-white p-6 rounded-2xl shadow-md" id="config-section">
+          <h2 class="text-xl font-bold text-gray-700 mb-4">Configurações</h2>
+          <div class="space-y-4">
+            <!-- Embalagem -->
+            <div class="flex items-start space-x-3">
+              <input type="checkbox" id="packaging-toggle" class="h-5 w-5 mt-0.5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+              <div class="flex-1">
+                <label for="packaging-toggle" class="font-medium text-gray-700">Incluir embalagem?</label>
+                <div id="packaging-input-container" class="mt-2 hidden">
+                  <label for="packaging-cost" class="block text-sm font-medium text-gray-600">Custo por embalagem (R$)</label>
+                  <input type="number" id="packaging-cost" placeholder="2.00" step="0.01" min="0" value="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+              </div>
+            </div>
+            <!-- Impressão -->
+            <div class="flex items-start space-x-3">
+              <input type="checkbox" id="printing-toggle" class="h-5 w-5 mt-0.5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500">
+              <div class="flex-1">
+                <label for="printing-toggle" class="font-medium text-gray-700">Incluir custo de impressão?</label>
+                <div id="printing-input-container" class="mt-2 hidden">
+                  <label for="printing-cost" class="block text-sm font-medium text-gray-600">Custo por impressão (R$)</label>
+                  <input type="number" id="printing-cost" placeholder="5.00" step="0.01" min="0" value="0" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+              </div>
+            </div>
+            <!-- Margem -->
+            <div>
+              <label for="profit-margin" class="block text-sm font-medium text-gray-700">Margem de Lucro (%)</label>
+              <input type="number" id="profit-margin" value="30" min="0" placeholder="30" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna do Orçamento -->
+      <div class="md:col-span-6">
+        <div class="bg-white p-6 rounded-2xl shadow-md min-h-full flex flex-col">
+          <!-- Header do orçamento (cliente + ações) -->
+          <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-4">
+            <div class="flex-1">
+              <label for="client-name" class="block text-sm font-medium text-gray-600">Cliente</label>
+              <input id="client-name" type="text" placeholder="Nome do cliente" class="mt-1 block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            <div id="actions-bar" class="flex-col gap-2">
+              <button id="history-btn" class="bg-slate-600 text-white px-3 py-2 rounded-lg shadow hover:bg-slate-700">Últimos Orçamentos</button>
+              <button id="save-budget" class="bg-blue-600 text-white px-3 py-2 rounded-lg shadow hover:bg-blue-700">Salvar Orçamento</button>
+              <button id="print-btn" class="bg-green-600 text-white px-3 py-2 rounded-lg shadow hover:bg-green-700">Exportar PDF</button>
+              <button id="whatsapp-btn" class="bg-emerald-600 text-white px-3 py-2 rounded-lg shadow hover:bg-emerald-700">WhatsApp</button>
+              <button id="clear-budget" class="bg-red-600 text-white px-3 py-2 rounded-lg shadow hover:bg-red-700">Limpar</button>
+            </div>
+          </div>
+
+          <!-- Seção para o Cliente -->
+          <div class="flex-grow">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-gray-700">Orçamento para Cliente</h2>
+            </div>
+            <div id="budget-list" class="space-y-3 mb-6">
+              <p id="empty-message" class="text-center text-gray-500 py-8">Nenhum item adicionado ainda.</p>
+            </div>
+          </div>
+
+          <!-- Total Final -->
+          <div class="bg-indigo-50 p-4 rounded-lg mt-auto">
+            <div class="flex justify-between items-center text-xl">
+              <span class="font-bold text-indigo-900">VALOR FINAL P/ CLIENTE</span>
+              <span id="grand-total" class="font-extrabold text-indigo-900">R$ 0,00</span>
+            </div>
+          </div>
+
+          <!-- Detalhes Internos -->
+          <div id="internal-section" class="mt-6 pt-4 border-t border-gray-200">
+            <h3 class="text-lg font-bold text-gray-600 mb-3 text-center">Detalhes do Custo (Uso Interno)</h3>
+            <div class="space-y-3 text-gray-600">
+              <div class="flex justify-between items-center">
+                <span>Subtotal dos Itens</span>
+                <span id="subtotal" class="font-semibold text-gray-800">R$ 0,00</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Custo Embalagem</span>
+                <span id="packaging-total" class="font-semibold text-gray-800">R$ 0,00</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Custo Impressão</span>
+                <span id="printing-total" class="font-semibold text-gray-800">R$ 0,00</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Lucro (<span id="profit-percentage">30</span>%)</span>
+                <span id="profit-amount" class="font-semibold text-green-600">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Histórico -->
+  <div id="history-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl">
+      <div class="flex items-center justify-between p-4 border-b">
+        <h3 class="text-lg font-semibold text-gray-800">Últimos Orçamentos</h3>
+        <button id="history-close" class="text-gray-500 hover:text-gray-700">✕</button>
+      </div>
+      <div id="history-list" class="p-4 max-h-[60vh] overflow-y-auto">
+        <!-- itens do histórico -->
+      </div>
+      <div class="p-4 border-t text-right">
+        <button id="history-clear-all" class="text-red-600 hover:underline">Excluir todos</button>
+      </div>
     </div>
+  </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Elementos do Formulário e Configuração
-            const addItemForm = document.getElementById('add-item-form');
-            const itemNameInput = document.getElementById('item-name');
-            const itemCostInput = document.getElementById('item-cost');
-            const itemQuantityInput = document.getElementById('item-quantity');
-            const packagingToggle = document.getElementById('packaging-toggle');
-            const packagingInputContainer = document.getElementById('packaging-input-container');
-            const packagingCostInput = document.getElementById('packaging-cost');
-            const profitMarginInput = document.getElementById('profit-margin');
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Utilidades seguras para evitar NaN
+      const numberOrZero = (v) => {
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : 0;
+      };
+      const intOrOne = (v) => {
+        const n = parseInt(v);
+        return Number.isInteger(n) && n > 0 ? n : 1;
+      };
+      const formatCurrency = (value) => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            // Elementos de Exibição
-            const budgetList = document.getElementById('budget-list');
-            const emptyMessage = document.getElementById('empty-message');
-            const subtotalEl = document.getElementById('subtotal');
-            const packagingTotalEl = document.getElementById('packaging-total');
-            const profitPercentageEl = document.getElementById('profit-percentage');
-            const profitAmountEl = document.getElementById('profit-amount');
-            const grandTotalEl = document.getElementById('grand-total');
-            const clearBudgetBtn = document.getElementById('clear-budget');
+      // Elementos do DOM
+      const addItemForm = document.getElementById('add-item-form');
+      const itemNameInput = document.getElementById('item-name');
+      const itemCostInput = document.getElementById('item-cost');
+      const itemQuantityInput = document.getElementById('item-quantity');
 
-            // Estado da aplicação (dados)
-            let budgetItems = JSON.parse(localStorage.getItem('budgetItems')) || [];
+      const packagingToggle = document.getElementById('packaging-toggle');
+      const packagingInputContainer = document.getElementById('packaging-input-container');
+      const packagingCostInput = document.getElementById('packaging-cost');
 
-            // --- FUNÇÕES ---
+      const printingToggle = document.getElementById('printing-toggle');
+      const printingInputContainer = document.getElementById('printing-input-container');
+      const printingCostInput = document.getElementById('printing-cost');
 
-            const formatCurrency = (value) => {
-                return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            };
+      const profitMarginInput = document.getElementById('profit-margin');
 
-            const render = () => {
-                budgetList.innerHTML = '';
-                
-                if (budgetItems.length === 0) {
-                    budgetList.appendChild(emptyMessage);
-                    emptyMessage.style.display = 'block';
-                } else {
-                    emptyMessage.style.display = 'none';
-                    const packagingCostPerItem = packagingToggle.checked ? parseFloat(packagingCostInput.value) || 0 : 0;
-                    const profitMargin = parseFloat(profitMarginInput.value) || 0;
+      const clientNameInput = document.getElementById('client-name');
 
-                    budgetItems.forEach((item, index) => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg';
-                        
-                        // Cálculos por unidade
-                        const costPerUnitWithPackaging = item.cost + packagingCostPerItem;
-                        const profitPerUnit = costPerUnitWithPackaging * (profitMargin / 100);
-                        const finalPricePerUnit = costPerUnitWithPackaging + profitPerUnit;
+      const budgetList = document.getElementById('budget-list');
+      const emptyMessage = document.getElementById('empty-message');
 
-                        // Total da linha (para todas as quantidades)
-                        const lineItemTotal = finalPricePerUnit * item.quantity;
+      const subtotalEl = document.getElementById('subtotal');
+      const packagingTotalEl = document.getElementById('packaging-total');
+      const printingTotalEl = document.getElementById('printing-total');
+      const profitPercentageEl = document.getElementById('profit-percentage');
+      const profitAmountEl = document.getElementById('profit-amount');
+      const grandTotalEl = document.getElementById('grand-total');
 
-                        // HTML limpo para o cliente
-                        let itemHTML = `
-                            <div class="flex-1">
-                                <p class="font-semibold text-gray-800">${item.name}</p>
-                                <p class="text-sm text-gray-500">${item.quantity} un. x ${formatCurrency(finalPricePerUnit)}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-semibold text-gray-900">${formatCurrency(lineItemTotal)}</p>
-                                <button data-index="${index}" class="remove-item-btn text-xs text-red-500 hover:text-red-700">Remover</button>
-                            </div>
-                        `;
-                        itemEl.innerHTML = itemHTML;
-                        budgetList.appendChild(itemEl);
-                    });
-                }
-                updateCalculations();
-                saveToLocalStorage();
-            };
+      const clearBudgetBtn = document.getElementById('clear-budget');
+      const saveBudgetBtn = document.getElementById('save-budget');
+      const printBtn = document.getElementById('print-btn');
+      const whatsappBtn = document.getElementById('whatsapp-btn');
 
-            const updateCalculations = () => {
-                const subtotal = budgetItems.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
-                const totalQuantity = budgetItems.reduce((acc, item) => acc + item.quantity, 0);
+      const historyBtn = document.getElementById('history-btn');
+      const historyModal = document.getElementById('history-modal');
+      const historyClose = document.getElementById('history-close');
+      const historyList = document.getElementById('history-list');
+      const historyClearAll = document.getElementById('history-clear-all');
 
-                const packagingCost = packagingToggle.checked ? parseFloat(packagingCostInput.value) || 0 : 0;
-                const packagingTotal = packagingCost * totalQuantity;
+      // Estado
+      let budgetItems = JSON.parse(localStorage.getItem('budgetItems') || '[]');
+      let budgets = JSON.parse(localStorage.getItem('budgets') || '[]');
 
-                const profitMargin = parseFloat(profitMarginInput.value) || 0;
-                const profitAmount = (subtotal + packagingTotal) * (profitMargin / 100);
+      // Renderização principal
+      const render = () => {
+        budgetList.innerHTML = '';
 
-                const grandTotal = subtotal + packagingTotal + profitAmount;
+        if (!Array.isArray(budgetItems) || budgetItems.length === 0) {
+          budgetList.appendChild(emptyMessage);
+          emptyMessage.style.display = 'block';
+        } else {
+          emptyMessage.style.display = 'none';
 
-                // Atualiza a interface
-                subtotalEl.textContent = formatCurrency(subtotal);
-                packagingTotalEl.textContent = formatCurrency(packagingTotal);
-                profitPercentageEl.textContent = profitMargin;
-                profitAmountEl.textContent = formatCurrency(profitAmount);
-                grandTotalEl.textContent = formatCurrency(grandTotal);
-            };
-            
-            const saveToLocalStorage = () => {
-                localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
-            };
+          const packagingCostPerItem = packagingToggle.checked ? numberOrZero(packagingCostInput.value) : 0;
+          const printingCostPerItem = printingToggle.checked ? numberOrZero(printingCostInput.value) : 0;
+          const profitMargin = numberOrZero(profitMarginInput.value);
 
-            // --- MANIPULADORES DE EVENTOS ---
+          budgetItems.forEach((item, index) => {
+            const name = item.name || '';
+            const cost = numberOrZero(item.cost);
+            const qty = intOrOne(item.quantity);
 
-            addItemForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = itemNameInput.value.trim();
-                const cost = parseFloat(itemCostInput.value);
-                const quantity = parseInt(itemQuantityInput.value);
+            const itemEl = document.createElement('div');
+            itemEl.className = 'flex justify-between items-center bg-gray-50 p-3 rounded-lg';
 
-                if (name && cost >= 0 && quantity >= 1) {
-                    budgetItems.push({ name, cost, quantity });
-                    render();
-                    addItemForm.reset();
-                    itemNameInput.focus();
-                }
-            });
+            // Cálculos por unidade (para o cliente)
+            const costPerUnitWithExtras = cost + packagingCostPerItem + printingCostPerItem;
+            const finalPricePerUnit = costPerUnitWithExtras * (1 + (profitMargin / 100));
+            const lineItemTotal = finalPricePerUnit * qty;
 
-            budgetList.addEventListener('click', (e) => {
-                if (e.target.classList.contains('remove-item-btn')) {
-                    const index = parseInt(e.target.dataset.index);
-                    budgetItems.splice(index, 1);
-                    render();
-                }
-            });
-            
-            clearBudgetBtn.addEventListener('click', () => {
-                if (confirm('Tem certeza que deseja limpar todos os itens do orçamento?')) {
-                    budgetItems = [];
-                    render();
-                }
-            });
+            itemEl.innerHTML = `
+              <div class="flex-1">
+                <p class="font-semibold text-gray-800">${name}</p>
+                <p class="text-sm text-gray-500">${qty} un. x ${formatCurrency(finalPricePerUnit)}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-semibold text-gray-900">${formatCurrency(lineItemTotal)}</p>
+                <button data-index="${index}" class="remove-item-btn text-xs text-red-500 hover:text-red-700">Remover</button>
+              </div>
+            `;
 
-            packagingToggle.addEventListener('change', () => {
-                packagingInputContainer.classList.toggle('hidden', !packagingToggle.checked);
-                render(); // Re-renderiza para mostrar/esconder o custo da embalagem nos itens
-            });
+            budgetList.appendChild(itemEl);
+          });
+        }
+        updateCalculations();
+        localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+      };
 
-            packagingCostInput.addEventListener('input', render); // Re-renderiza para atualizar os valores
-            profitMarginInput.addEventListener('input', render); // Re-renderiza para atualizar os valores
+      // Cálculos totais (internos + cliente)
+      const updateCalculations = () => {
+        const subtotal = (Array.isArray(budgetItems) ? budgetItems : []).reduce((acc, item) => {
+          const c = numberOrZero(item.cost);
+          const q = intOrOne(item.quantity);
+          return acc + (c * q);
+        }, 0);
 
-            // --- INICIALIZAÇÃO ---
-            render();
+        const totalQuantity = (Array.isArray(budgetItems) ? budgetItems : []).reduce((acc, item) => acc + intOrOne(item.quantity), 0);
+
+        const packagingCost = packagingToggle.checked ? numberOrZero(packagingCostInput.value) : 0;
+        const packagingTotal = packagingCost * totalQuantity;
+
+        const printingCost = printingToggle.checked ? numberOrZero(printingCostInput.value) : 0;
+        const printingTotal = printingCost * totalQuantity;
+
+        const profitMargin = numberOrZero(profitMarginInput.value);
+        const profitAmount = (subtotal + packagingTotal + printingTotal) * (profitMargin / 100);
+
+        const grandTotal = subtotal + packagingTotal + printingTotal + profitAmount;
+
+        // Atualiza UI
+        subtotalEl.textContent = formatCurrency(subtotal);
+        packagingTotalEl.textContent = formatCurrency(packagingTotal);
+        printingTotalEl.textContent = formatCurrency(printingTotal);
+        profitPercentageEl.textContent = profitMargin;
+        profitAmountEl.textContent = formatCurrency(profitAmount);
+        grandTotalEl.textContent = formatCurrency(grandTotal);
+
+        return { subtotal, packagingTotal, printingTotal, profitAmount, grandTotal, totalQuantity, profitMargin };
+      };
+
+      // Histórico (modal)
+      const openHistory = () => {
+        renderHistory();
+        historyModal.classList.remove('hidden');
+        historyModal.classList.add('flex');
+      };
+      const closeHistory = () => {
+        historyModal.classList.add('hidden');
+        historyModal.classList.remove('flex');
+      };
+
+      const renderHistory = () => {
+        historyList.innerHTML = '';
+        if (!budgets.length) {
+          historyList.innerHTML = '<p class="text-gray-500">Nenhum orçamento salvo ainda.</p>';
+          return;
+        }
+        // Ordena por data desc
+        const ordered = [...budgets].sort((a,b) => (b.id||0) - (a.id||0));
+        ordered.forEach(b => {
+          const row = document.createElement('div');
+          row.className = 'flex items-center justify-between border-b py-3 gap-3';
+          const when = new Date(b.createdAt || b.id).toLocaleString('pt-BR');
+          const total = b.totals && typeof b.totals.grandTotal === 'number' ? formatCurrency(b.totals.grandTotal) : '—';
+          row.innerHTML = `
+            <div class="min-w-0">
+              <p class="font-medium text-gray-800 truncate">${b.clientName || 'Sem nome'}</p>
+              <p class="text-sm text-gray-500">${when}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-indigo-700 font-semibold">${total}</span>
+              <button data-id="${b.id}" class="load-b btn px-3 py-1 rounded-lg bg-slate-600 text-white hover:bg-slate-700">Carregar</button>
+              <button data-id="${b.id}" class="del-b btn px-3 py-1 rounded-lg bg-red-600 text-white hover:bg-red-700">Excluir</button>
+            </div>
+          `;
+          historyList.appendChild(row);
         });
-    </script>
+      };
 
+      const saveBudget = () => {
+        const { subtotal, packagingTotal, printingTotal, profitAmount, grandTotal } = updateCalculations();
+        const budget = {
+          id: Date.now(),
+          createdAt: new Date().toISOString(),
+          clientName: (clientNameInput.value || '').trim(),
+          items: budgetItems,
+          packaging: { enabled: !!packagingToggle.checked, cost: numberOrZero(packagingCostInput.value) },
+          printing: { enabled: !!printingToggle.checked, cost: numberOrZero(printingCostInput.value) },
+          profitMargin: numberOrZero(profitMarginInput.value),
+          totals: { subtotal, packagingTotal, printingTotal, profitAmount, grandTotal }
+        };
+        budgets.push(budget);
+        // Limita a 50 últimos
+        if (budgets.length > 50) budgets = budgets.slice(budgets.length - 50);
+        localStorage.setItem('budgets', JSON.stringify(budgets));
+        alert('✅ Orçamento salvo!');
+      };
+
+      const loadBudget = (id) => {
+        const b = budgets.find(x => String(x.id) === String(id));
+        if (!b) return;
+        // Recarrega estado
+        budgetItems = Array.isArray(b.items) ? b.items.map(it => ({
+          name: it.name || '',
+          cost: numberOrZero(it.cost),
+          quantity: intOrOne(it.quantity)
+        })) : [];
+        packagingToggle.checked = !!(b.packaging && b.packaging.enabled);
+        packagingCostInput.value = b.packaging ? numberOrZero(b.packaging.cost) : 0;
+        packagingInputContainer.classList.toggle('hidden', !packagingToggle.checked);
+
+        printingToggle.checked = !!(b.printing && b.printing.enabled);
+        printingCostInput.value = b.printing ? numberOrZero(b.printing.cost) : 0;
+        printingInputContainer.classList.toggle('hidden', !printingToggle.checked);
+
+        profitMarginInput.value = numberOrZero(b.profitMargin);
+        clientNameInput.value = b.clientName || '';
+
+        render();
+        closeHistory();
+      };
+
+      const deleteBudget = (id) => {
+        budgets = budgets.filter(x => String(x.id) !== String(id));
+        localStorage.setItem('budgets', JSON.stringify(budgets));
+        renderHistory();
+      };
+
+      const clearCurrentBudget = () => {
+        budgetItems = [];
+        localStorage.setItem('budgetItems', JSON.stringify(budgetItems));
+        render();
+      };
+
+      const sendWhatsApp = () => {
+        // Monta texto só com itens + total (sem detalhes internos)
+        const { grandTotal } = updateCalculations();
+        const packagingCostPerItem = packagingToggle.checked ? numberOrZero(packagingCostInput.value) : 0;
+        const printingCostPerItem = printingToggle.checked ? numberOrZero(printingCostInput.value) : 0;
+        const profitMargin = numberOrZero(profitMarginInput.value);
+
+        const lines = (budgetItems || []).map(it => {
+          const c = numberOrZero(it.cost);
+          const q = intOrOne(it.quantity);
+          const fppu = (c + packagingCostPerItem + printingCostPerItem) * (1 + (profitMargin/100));
+          return `- ${q}x ${it.name} — ${formatCurrency(fppu)}`;
+        }).join('\n');
+
+        const txt = `*Orçamento*%0ACliente: ${encodeURIComponent((clientNameInput.value||'').trim())}%0A%0AItens:%0A${encodeURIComponent(lines)}%0A%0ATotal: ${encodeURIComponent(formatCurrency(grandTotal))}`;
+        const url = `https://wa.me/?text=${txt}`;
+        window.open(url, '_blank');
+      };
+
+      // Eventos
+      addItemForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = (itemNameInput.value || '').trim();
+        const cost = numberOrZero(itemCostInput.value);
+        const quantity = intOrOne(itemQuantityInput.value);
+        if (!name) { alert('Informe o nome do item.'); return; }
+        budgetItems.push({ name, cost, quantity });
+        // Limpa inputs
+        addItemForm.reset();
+        itemQuantityInput.value = 1;
+        itemNameInput.focus();
+        render();
+      });
+
+      document.getElementById('budget-list').addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-item-btn')) {
+          const index = parseInt(e.target.dataset.index);
+          if (Number.isInteger(index)) {
+            budgetItems.splice(index, 1);
+            render();
+          }
+        }
+      });
+
+      clearBudgetBtn.addEventListener('click', clearCurrentBudget);
+      saveBudgetBtn.addEventListener('click', saveBudget);
+      printBtn.addEventListener('click', () => window.print());
+      whatsappBtn.addEventListener('click', sendWhatsApp);
+
+      packagingToggle.addEventListener('change', () => {
+        packagingInputContainer.classList.toggle('hidden', !packagingToggle.checked);
+        render();
+      });
+      printingToggle.addEventListener('change', () => {
+        printingInputContainer.classList.toggle('hidden', !printingToggle.checked);
+        render();
+      });
+
+      packagingCostInput.addEventListener('input', render);
+      printingCostInput.addEventListener('input', render);
+      profitMarginInput.addEventListener('input', render);
+
+      historyBtn.addEventListener('click', openHistory);
+      historyClose.addEventListener('click', closeHistory);
+      historyModal.addEventListener('click', (e) => { if (e.target === historyModal) closeHistory(); });
+      historyList.addEventListener('click', (e) => {
+        if (e.target.classList.contains('load-b')) {
+          loadBudget(e.target.dataset.id);
+        } else if (e.target.classList.contains('del-b')) {
+          if (confirm('Excluir este orçamento?')) deleteBudget(e.target.dataset.id);
+        }
+      });
+      historyClearAll.addEventListener('click', () => {
+        if (confirm('Tem certeza que deseja excluir TODOS os orçamentos salvos?')) {
+          budgets = [];
+          localStorage.setItem('budgets', JSON.stringify(budgets));
+          renderHistory();
+        }
+      });
+
+      // Inicializa UI coerente com toggles
+      packagingInputContainer.classList.toggle('hidden', !packagingToggle.checked);
+      printingInputContainer.classList.toggle('hidden', !printingToggle.checked);
+
+      render();
+    });
+  </script>
 </body>
 </html>
